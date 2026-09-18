@@ -183,9 +183,13 @@ Rules:
       "🤖 GEMINI RESPONSE RECEIVED"
     );
 
-    const result = JSON.parse(
-      interaction.output_text
-    );
+    const outputText = interaction.output_text;
+
+if (!outputText) {
+  throw new Error("Gemini returned no output text.");
+}
+
+const result = JSON.parse(outputText);
 
     console.log(
       "✅ GEMINI ANALYSIS SUCCESS"

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { loginUser, registerUser } from "@/lib/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -60,6 +60,7 @@ export default function LoginPage() {
         );
 
         const token = await registration.user.getIdToken();
+
         const profileResponse = await fetch(
           "/api/citizen/profile",
           {
@@ -80,8 +81,13 @@ export default function LoginPage() {
         );
 
         if (!profileResponse.ok) {
-          const profileError = await profileResponse.json().catch(() => ({}));
-          throw new Error(profileError.error || "Unable to save your profile.");
+          const profileError =
+            await profileResponse.json().catch(() => ({}));
+
+          throw new Error(
+            profileError.error ||
+              "Unable to save your profile."
+          );
         }
 
         setMessage(
@@ -143,9 +149,7 @@ export default function LoginPage() {
       // ========================================
 
       if (selectedRole === "admin") {
-
         if (!data.isAdmin) {
-
           console.log(
             "🚫 CITIZEN BLOCKED FROM GOVERNMENT PORTAL"
           );
@@ -173,9 +177,7 @@ export default function LoginPage() {
       // ========================================
 
       if (selectedRole === "citizen") {
-
         if (data.isAdmin) {
-
           console.log(
             "🚫 ADMIN BLOCKED FROM CITIZEN PORTAL"
           );
@@ -197,9 +199,7 @@ export default function LoginPage() {
 
         return;
       }
-
     } catch (error: any) {
-
       console.error(
         "❌ LOGIN ERROR:",
         error
@@ -212,7 +212,6 @@ export default function LoginPage() {
         setMessage(
           "This email is already registered."
         );
-
       } else if (
         error.code ===
         "auth/invalid-email"
@@ -220,7 +219,6 @@ export default function LoginPage() {
         setMessage(
           "Please enter a valid email."
         );
-
       } else if (
         error.code ===
         "auth/weak-password"
@@ -228,7 +226,6 @@ export default function LoginPage() {
         setMessage(
           "Password must be at least 6 characters."
         );
-
       } else if (
         error.code ===
           "auth/invalid-credential" ||
@@ -238,7 +235,6 @@ export default function LoginPage() {
         setMessage(
           "Invalid email or password."
         );
-
       } else {
         setMessage(
           `Firebase error: ${
@@ -249,7 +245,6 @@ export default function LoginPage() {
           }`
         );
       }
-
     } finally {
       setLoading(false);
     }
@@ -313,7 +308,9 @@ export default function LoginPage() {
                   <input
                     type="text"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    onChange={(e) =>
+                      setFullName(e.target.value)
+                    }
                     placeholder="Your full name"
                     required
                     className="w-full px-4 py-3 rounded-lg bg-[#07111f] border border-slate-700 outline-none focus:border-blue-500"
@@ -353,7 +350,9 @@ export default function LoginPage() {
                   <input
                     type="date"
                     value={dateOfBirth}
-                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    onChange={(e) =>
+                      setDateOfBirth(e.target.value)
+                    }
                     required
                     className="w-full px-4 py-3 rounded-lg bg-[#07111f] border border-slate-700 outline-none focus:border-blue-500"
                   />
@@ -366,15 +365,27 @@ export default function LoginPage() {
 
                   <select
                     value={gender}
-                    onChange={(e) => setGender(e.target.value)}
+                    onChange={(e) =>
+                      setGender(e.target.value)
+                    }
                     required
                     className="w-full px-4 py-3 rounded-lg bg-[#07111f] border border-slate-700 outline-none focus:border-blue-500"
                   >
-                    <option value="">Select gender</option>
-                    <option value="Female">Female</option>
-                    <option value="Male">Male</option>
-                    <option value="Non-binary">Non-binary</option>
-                    <option value="Prefer not to say">Prefer not to say</option>
+                    <option value="">
+                      Select gender
+                    </option>
+                    <option value="Female">
+                      Female
+                    </option>
+                    <option value="Male">
+                      Male
+                    </option>
+                    <option value="Non-binary">
+                      Non-binary
+                    </option>
+                    <option value="Prefer not to say">
+                      Prefer not to say
+                    </option>
                   </select>
                 </div>
 
@@ -386,7 +397,9 @@ export default function LoginPage() {
                   <input
                     type="text"
                     value={city}
-                    onChange={(e) => setCity(e.target.value)}
+                    onChange={(e) =>
+                      setCity(e.target.value)
+                    }
                     required
                     className="w-full px-4 py-3 rounded-lg bg-[#07111f] border border-slate-700 outline-none focus:border-blue-500"
                   />
@@ -400,7 +413,9 @@ export default function LoginPage() {
                   <input
                     type="text"
                     value={state}
-                    onChange={(e) => setState(e.target.value)}
+                    onChange={(e) =>
+                      setState(e.target.value)
+                    }
                     required
                     className="w-full px-4 py-3 rounded-lg bg-[#07111f] border border-slate-700 outline-none focus:border-blue-500"
                   />
@@ -507,5 +522,13 @@ export default function LoginPage() {
       </div>
 
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
